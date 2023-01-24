@@ -1,18 +1,27 @@
-use playwright::Playwright;
+use color_eyre::{Result};
+use polars::prelude::*;
+use reqwest::blocking::Client;
+use std::io::Cursor;
 
-#[tokio::main]
-async fn main() -> Result<(), playwright::Error> {
-    let playwright = Playwright::initialize().await?;
-    playwright.prepare()?; // Install browsers
-    let chromium = playwright.chromium();
-    let browser = chromium.launcher().headless(true).launch().await?;
-    let context = browser.context_builder().build().await?;
-    let page = context.new_page().await?;
-    page.goto_builder("https://example.com/").goto().await?;
+fn main() -> Result<()> { 
+    let data: Vec<u8> = Client::new()
+        .get("https://j.mp/iriscsv")
+        .send()?
+        .text()?
+        .bytes()
+        .collect();
 
-    // Exec in browser and Deserialize with serde
-    let s: String = page.eval("() => location.href").await?;
-    assert_eq!(s, "https://example.com/");
-    page.click_builder("a").click().await?;
+    let df = CsvReader::new(Cursor::new(data))
+        .has_header(true)
+        .finish()?
+        .lazy()
+        .filter(col("sepal_length").gt(5))
+        .groupby([col("species")])
+        .agg([col("*").sum()])
+        .collect()?;
+
+    println!("{:?}", df);
+
     Ok(())
 }
+
