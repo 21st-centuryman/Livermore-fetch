@@ -1,27 +1,30 @@
-use color_eyre::{Result};
-use polars::prelude::*;
-use reqwest::blocking::Client;
-use std::io::Cursor;
+use std::error::Error;
+use yahoo_finance::{history, Interval, Timestamped};
 
-fn main() -> Result<()> { 
-    let data: Vec<u8> = Client::new()
-        .get("https://j.mp/iriscsv")
-        .send()?
-        .text()?
-        .bytes()
-        .collect();
+#[tokio::main]
+async fn print(value: &str) {
+    match history::retrieve_interval(value, Interval::_10y).await {
+        Err(e) => println!("Failed to call Yahoo: {:?}", e),
+        Ok(data) => {
+            for bar in &data {
+                println!(
+                    "{} | {} | {} | {}",
+                    value,
+                    bar.datetime(),
+                    bar.open,
+                    bar.close
+                )
+            }
+        }
+    }
+}
 
-    let df = CsvReader::new(Cursor::new(data))
-        .has_header(true)
-        .finish()?
-        .lazy()
-        .filter(col("sepal_length").gt(5))
-        .groupby([col("species")])
-        .agg([col("*").sum()])
-        .collect()?;
-
-    println!("{:?}", df);
-
+fn main() ->  Result<(), Box<dyn Error>>  {
+    let mut rdr = csv::Reader::from_path("screener/nasdaq_screener.csv")?;
+    for result in rdr.records() {
+        let record = result?;
+        print(record.get(0).unwrap());
+    }
     Ok(())
 }
 
