@@ -1,7 +1,7 @@
 <div align="center">
 
 # Livermore-fetch
-##### Fetch, process, and analyse stock data!
+##### Fetch, and process stock data!
 
 [![Rust](https://img.shields.io/badge/Yahoo_finance_api-6001D2.svg?style=for-the-badge&logo=yahoo)](https://docs.rs/yahoo_finance_api/latest/yahoo_finance_api/)
 [![Python](https://img.shields.io/badge/Polars-CD792C.svg?style=for-the-badge&logo=polars&logoColor=white)](https://www.pola.rs/)
