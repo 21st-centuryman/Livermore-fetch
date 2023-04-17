@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 use time::{ext::NumericalDuration, OffsetDateTime};
 use tokio_test;
+use yahoo::Quote;
 use yahoo_finance_api as yahoo;
 
 fn main() {
@@ -50,7 +51,23 @@ fn fetch_api(stock: &str, start: OffsetDateTime, end: OffsetDateTime) {
 }
 
 fn build_csv(name: &str, resp: yahoo_finance_api::YResponse) {
+    let mut counter: i64 = 0;
+    let mut yesterday: Quote = resp.quotes().unwrap()[0].clone();
+
     for quote in resp.quotes().unwrap() {
+        if counter > 0 {
+            println!("{}", days_since(quote.timestamp, yesterday.timestamp));
+        }
+
         println!("{} | {:?} | {:?}", name, quote.open, quote.close);
+
+        yesterday = quote;
+        counter += 1;
     }
+}
+
+fn days_since(start: u64, end: u64) -> i64 {
+    return (OffsetDateTime::from_unix_timestamp(start as i64).unwrap()
+        - OffsetDateTime::from_unix_timestamp(end as i64).unwrap())
+    .whole_days();
 }
