@@ -1,16 +1,12 @@
-use chrono::{DateTime, Datelike, TimeZone, Utc};
 use std::collections::HashSet;
+use time::{ext::NumericalDuration, OffsetDateTime};
 use tokio_test;
 use yahoo_finance_api as yahoo;
 
 fn main() {
-    let now = Utc::now();
-    let start = Utc
-        .with_ymd_and_hms(now.year() - 10, now.month(), now.day(), 0, 0, 0)
-        .unwrap();
-    let end = Utc
-        .with_ymd_and_hms(now.year(), now.month(), now.day(), 0, 0, 0)
-        .unwrap();
+    let now = OffsetDateTime::now_utc();
+    let end = now.clone();
+    let start = now.clone().saturating_sub(3652.days());
 
     let screener: HashSet<String> = screener();
 
@@ -39,21 +35,19 @@ fn screener() -> HashSet<String> {
     return screener;
 }
 
-fn fetch_api(stock: &str, start: DateTime<Utc>, end: DateTime<Utc>) {
+fn fetch_api(stock: &str, start: OffsetDateTime, end: OffsetDateTime) {
     let provider = yahoo::YahooConnector::new();
     let resp = tokio_test::block_on(provider.get_quote_history(stock, start, end));
 
     match resp {
         Ok(resp) => {
             build_csv(stock, resp);
-        },
+        }
         Err(_msg) => {
-            println!("Stock. {}. Failed.", stock);
-            println!("Moving to the next one");
+            println!("FAILED: {}", stock);
         }
     };
 }
-
 
 fn build_csv(name: &str, resp: yahoo_finance_api::YResponse) {
     for quote in resp.quotes().unwrap() {
