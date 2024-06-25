@@ -23,5 +23,5 @@ This is still a major work in progress, please see below for the 4 stages to thi
 
 - [X] Fetch all symbols used in the yahoo api.
 - [X] Fetch all the daily stock information for the last 10 years.
-- [] Integrate this with [polars](https://www.pola.rs/) to account for after market trades.
+- [x] Integrate this with [polars](https://www.pola.rs/) to account for after market trades.
 - [] Add a dockerfile to make this able to be executed monthly on servers headlessly.
