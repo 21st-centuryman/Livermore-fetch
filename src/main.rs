@@ -127,8 +127,8 @@ fn build_csv(name: &str, quotes: Vec<Vec<f64>>) {
     ])
     .unwrap();
 
-    CsvWriter::new(File::create(format!("./data/{name}.csv")).expect("could not create file"))
-        .include_header(false)
+    CsvWriter::new(File::create(format!("../data/{name}.csv")).expect("could not create file"))
+        .include_header(true)
         .with_separator(b',')
         .finish(&mut df);
     println!("Ticker: {name} DONE");
