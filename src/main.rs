@@ -6,7 +6,7 @@ use tokio_test;
 use yahoo_finance_api::{self as yahoo, Quote};
 
 fn main() {
-    let csv_file = <YOUR CSV FILE OF ALL TICKER>;
+    let csv_file = "YOUR CSV TICKER LIST";
     CsvReader::new(BufReader::new(File::open(csv_file).unwrap())) // Stuff to read the file
         .finish()
         .unwrap()[0] // Get the first value, ie all ticker symbols
@@ -117,7 +117,7 @@ fn build_csv(name: &str, quotes: Vec<Vec<f64>>) {
     .unwrap();
 
     let _ =
-        CsvWriter::new(File::create(format!("../data/{name}.csv")).expect("could not create file"))
+        CsvWriter::new(File::create(format!("../data/{}.csv", name.replace("/", "|"))).unwrap())
             .include_header(true)
             .with_separator(b',')
             .finish(&mut df);
