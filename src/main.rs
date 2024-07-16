@@ -1,31 +1,20 @@
 use chrono::prelude::*;
 use polars::prelude::*;
-use std::collections::HashSet;
 use std::fs::File;
+use std::io::BufReader;
 use tokio_test;
 use yahoo_finance_api::{self as yahoo, Quote};
 
 fn main() {
-    search_tickers()
+    let csv_file = <YOUR CSV FILE OF ALL TICKER>;
+    CsvReader::new(BufReader::new(File::open(csv_file).unwrap())) // Stuff to read the file
+        .finish()
+        .unwrap()[0] // Get the first value, ie all ticker symbols
+        .iter()
+        .map(|item| item.to_string().replace("\"", "")) // Format and fix the dataframe
+        .collect::<Vec<String>>()
         .iter()
         .for_each(|ticker| build_csv(ticker, add_fake_vals(get_quote_range(ticker))));
-}
-
-fn search_tickers() -> HashSet<String> {
-    let mut results: HashSet<String> = Default::default();
-    results.extend((65u8..97).flat_map(|a| {
-        tokio_test::block_on(
-            yahoo::YahooConnector::new()
-                .unwrap()
-                .search_ticker(&(a as char).to_string()),
-        )
-        .unwrap()
-        .quotes
-        .iter()
-        .map(|sym| sym.symbol.clone())
-        .collect::<Vec<_>>()
-    }));
-    return results;
 }
 
 fn get_quote_range(quote: &str) -> Vec<Quote> {
@@ -127,9 +116,10 @@ fn build_csv(name: &str, quotes: Vec<Vec<f64>>) {
     ])
     .unwrap();
 
-    CsvWriter::new(File::create(format!("../data/{name}.csv")).expect("could not create file"))
-        .include_header(true)
-        .with_separator(b',')
-        .finish(&mut df);
+    let _ =
+        CsvWriter::new(File::create(format!("../data/{name}.csv")).expect("could not create file"))
+            .include_header(true)
+            .with_separator(b',')
+            .finish(&mut df);
     println!("Ticker: {name} DONE");
 }
