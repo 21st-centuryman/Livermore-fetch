@@ -2,21 +2,15 @@ use chrono::prelude::*;
 use kdam::{term::Colorizer, tqdm, Colour, TqdmIterator};
 use polars::prelude::*;
 use std::fs::File;
-use std::io::{stderr, BufReader, IsTerminal};
+use std::io::IsTerminal;
 use tokio::runtime::Runtime;
 use yahoo_finance_api::{self as yahoo, Quote};
 
 fn main() {
     let csv_file = "YOUR CSV TICKER LIST";
-    let tickers = CsvReader::new(BufReader::new(File::open(csv_file).unwrap())) // Stuff to read the file
-        .finish()
-        .unwrap()[0] // Get the first value, ie all ticker symbols
-        .iter()
-        .map(|item| item.to_string().replace("\"", "")) // Format and fix the dataframe
-        .collect::<Vec<String>>();
 
     // A nice progress bar
-    kdam::term::init(stderr().is_terminal());
+    kdam::term::init(std::io::stderr().is_terminal());
     let pb = tqdm!(
         bar_format = format!(
             "{} {} {} [ {} < {} {} ]",
@@ -29,10 +23,15 @@ fn main() {
         ),
         colour = Colour::gradient(&["#5A56E0", "#EE6FF8"])
     );
-    // Nice with progess
-    tickers
+
+    CsvReader::new(std::io::BufReader::new(File::open(csv_file).unwrap())) // Stuff to read the file
+        .finish()
+        .unwrap()[0] // Get the first value, ie all ticker symbols
         .iter()
-        .tqdm_with_bar(pb)
+        .map(|item| item.to_string().replace("\"", "")) // Format and fix the dataframe
+        .collect::<Vec<String>>()
+        .iter()
+        .tqdm_with_bar(pb) // Nice with a progress bar
         .for_each(|ticker| build_csv(ticker, add_fake_vals(get_quote_range(ticker))));
 }
 
