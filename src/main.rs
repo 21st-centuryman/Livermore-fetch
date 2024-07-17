@@ -1,10 +1,9 @@
 use chrono::prelude::*;
-use kdam::{term, tqdm, BarExt, Column, RichProgress};
+use kdam::{term::Colorizer, tqdm, Colour, TqdmIterator};
 use polars::prelude::*;
 use std::fs::File;
-use std::io::BufReader;
-use std::io::{stderr, IsTerminal};
-use tokio_test;
+use std::io::{stderr, BufReader, IsTerminal};
+use tokio::runtime::Runtime;
 use yahoo_finance_api::{self as yahoo, Quote};
 
 fn main() {
@@ -17,35 +16,33 @@ fn main() {
         .collect::<Vec<String>>();
 
     // A nice progress bar
-    term::init(stderr().is_terminal());
-    let mut pb = RichProgress::new(
-        tqdm!(total = tickers.len()),
-        vec![
-            Column::Percentage(2),
-            Column::Animation,
-            Column::CountTotal,
-            Column::Text("[".to_owned()),
-            Column::ElapsedTime,
-            Column::Text("<".to_owned()),
-            Column::RemainingTime,
-            Column::Rate,
-            Column::Text("]".to_owned()),
-        ],
+    kdam::term::init(stderr().is_terminal());
+    let pb = tqdm!(
+        bar_format = format!(
+            "{} {} {} [ {} < {} {} ]",
+            "{percentage:3.0}%",
+            "{animation}",
+            "{count}/{total}".colorize("green"),
+            "{elapsed}".colorize("yellow"),
+            "{remaining}".colorize("blue"),
+            "{rate:.1}it/s".colorize("red")
+        ),
+        colour = Colour::gradient(&["#5A56E0", "#EE6FF8"])
     );
     // Nice with progess
-    tickers.iter().for_each(|ticker| {
-        build_csv(ticker, add_fake_vals(get_quote_range(ticker)));
-        let _ = pb.write(format!("Ticker {}: DONE", ticker));
-        let _ = pb.update(1);
-    });
+    tickers
+        .iter()
+        .tqdm_with_bar(pb)
+        .for_each(|ticker| build_csv(ticker, add_fake_vals(get_quote_range(ticker))));
 }
 
 fn get_quote_range(quote: &str) -> Vec<Quote> {
-    match tokio_test::block_on(
+    match Runtime::new().unwrap().block_on(async {
         yahoo::YahooConnector::new()
             .unwrap()
-            .get_quote_range(quote, "1d", "10y"),
-    ) {
+            .get_quote_range(quote, "1d", "10y")
+            .await
+    }) {
         Ok(quotes) => quotes.quotes().unwrap_or_default(),
         Err(_) => Vec::new(),
     }
