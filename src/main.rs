@@ -1,20 +1,43 @@
 use chrono::prelude::*;
+use kdam::{term, tqdm, BarExt, Column, RichProgress};
 use polars::prelude::*;
 use std::fs::File;
 use std::io::BufReader;
+use std::io::{stderr, IsTerminal};
 use tokio_test;
 use yahoo_finance_api::{self as yahoo, Quote};
 
 fn main() {
     let csv_file = "YOUR CSV TICKER LIST";
-    CsvReader::new(BufReader::new(File::open(csv_file).unwrap())) // Stuff to read the file
+    let tickers = CsvReader::new(BufReader::new(File::open(csv_file).unwrap())) // Stuff to read the file
         .finish()
         .unwrap()[0] // Get the first value, ie all ticker symbols
         .iter()
         .map(|item| item.to_string().replace("\"", "")) // Format and fix the dataframe
-        .collect::<Vec<String>>()
-        .iter()
-        .for_each(|ticker| build_csv(ticker, add_fake_vals(get_quote_range(ticker))));
+        .collect::<Vec<String>>();
+
+    // A nice progress bar
+    term::init(stderr().is_terminal());
+    let mut pb = RichProgress::new(
+        tqdm!(total = tickers.len()),
+        vec![
+            Column::Percentage(2),
+            Column::Animation,
+            Column::CountTotal,
+            Column::Text("[".to_owned()),
+            Column::ElapsedTime,
+            Column::Text("<".to_owned()),
+            Column::RemainingTime,
+            Column::Rate,
+            Column::Text("]".to_owned()),
+        ],
+    );
+    // Nice with progess
+    tickers.iter().for_each(|ticker| {
+        build_csv(ticker, add_fake_vals(get_quote_range(ticker)));
+        let _ = pb.write(format!("Ticker {}: DONE", ticker));
+        let _ = pb.update(1);
+    });
 }
 
 fn get_quote_range(quote: &str) -> Vec<Quote> {
@@ -121,5 +144,4 @@ fn build_csv(name: &str, quotes: Vec<Vec<f64>>) {
             .include_header(true)
             .with_separator(b',')
             .finish(&mut df);
-    println!("Ticker: {name} DONE");
 }
