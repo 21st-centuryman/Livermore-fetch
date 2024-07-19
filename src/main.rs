@@ -51,7 +51,7 @@ fn main() {
                     Arg::new("path")
                         .help("/path/to/data && /path/to/output && size of columns")
                         .action(ArgAction::Set)
-                        .num_args(3),
+                        .num_args(2),
                 ),
         )
         .get_matches();
@@ -70,7 +70,7 @@ fn main() {
                 .expect("is present")
                 .map(|s| s.as_str())
                 .collect();
-            process(path[0], path[1], path[2].parse::<usize>().unwrap(), pb);
+            process(path[0], path[1], pb);
         }
         _ => unreachable!(), // If all subcommands are defined above, anything else is unreachable
     }
