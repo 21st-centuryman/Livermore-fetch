@@ -7,13 +7,6 @@ use pull::pull;
 mod process;
 use process::process;
 
-#[derive(Parser, Debug)]
-#[command(author, version, about)]
-struct Args {
-    #[arg(short, long)]
-    pull: String,
-}
-
 fn main() {
     // A nice progress bar
     kdam::term::init(std::io::stderr().is_terminal());
