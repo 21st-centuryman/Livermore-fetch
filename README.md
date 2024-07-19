@@ -2,9 +2,9 @@
 
 # Livermore-fetch
 ##### Fetch, and process stock data!
-
-[![Rust](https://img.shields.io/badge/Yahoo_finance_api-6001D2.svg?style=for-the-badge&logo=yahoo)](https://docs.rs/yahoo_finance_api/latest/yahoo_finance_api/)
-[![Python](https://img.shields.io/badge/Polars-CD792C.svg?style=for-the-badge&logo=polars&logoColor=white)](https://www.pola.rs/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED.svg?style=for-the-badge&logo=docker&logoColor=white)]()
+[![Rust](https://img.shields.io/badge/Yahoo_finance_api-6001D2.svg?style=for-the-badge&logo=yahoo)]()
+[![Python](https://img.shields.io/badge/Polars-CD792C.svg?style=for-the-badge&logo=polars&logoColor=white)]()
 </div>
 
 ## ⇁  Introduction
