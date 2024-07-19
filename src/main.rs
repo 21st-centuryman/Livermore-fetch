@@ -37,9 +37,9 @@ fn main() {
                 .about("Pull data from screener csv")
                 .arg(
                     Arg::new("path")
-                        .help("/path/to/screener")
+                        .help("/path/to/screener && /path/to/output/")
                         .action(ArgAction::Set)
-                        .num_args(1),
+                        .num_args(2),
                 ),
         )
         .subcommand(
@@ -49,7 +49,7 @@ fn main() {
                 .about("Process data for Livermore-analyze")
                 .arg(
                     Arg::new("path")
-                        .help("/path/to/data")
+                        .help("/path/to/data && /path/to/output && size of columns")
                         .action(ArgAction::Set)
                         .num_args(3),
                 ),
