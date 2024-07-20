@@ -18,5 +18,4 @@ VOLUME /ticker_list
 VOLUME /pull_output
 VOLUME /process_output
 
-CMD ["sh", "-c", "cargo run -- -P /ticker_list /pull_output "]
-CMD ["sh", "-c", "cargo run -- -p /pull_output /process_output"]
+CMD ["sh", "-c", "cargo run -- -P /ticker_list /pull_output; cargo run -- -p /pull_output /process_output"]

@@ -2,6 +2,7 @@ use chrono::prelude::*;
 use kdam::{Bar, TqdmIterator};
 use polars::prelude::*;
 use std::fs::File;
+use std::path::Path;
 use tokio::runtime::Runtime;
 use yahoo_finance_api::{self as yahoo, Quote};
 
@@ -117,10 +118,13 @@ fn build_csv(name: &str, quotes: Vec<Vec<f64>>, path_to: &str) {
     ])
     .unwrap();
 
-    let _ = CsvWriter::new(
-        File::create(format!("{}/{}.csv", path_to, name.replace("/", "|"))).unwrap(),
-    )
-    .include_header(true)
-    .with_separator(b',')
-    .finish(&mut df);
+    let filepath = format!("{}/{}.csv", path_to, name.replace("/", "|"));
+    //if Path::new(&filepath).exists() {
+    //} else {
+    CsvWriter::new(File::create(filepath).expect("Can't create file"))
+        .include_header(true)
+        .with_separator(b',')
+        .finish(&mut df)
+        .expect("Can't create file");
+    //}
 }

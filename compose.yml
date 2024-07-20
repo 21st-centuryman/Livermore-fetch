@@ -1,0 +1,9 @@
+services:
+  livermore:
+    image: livermore
+    container_name: livermore
+    volumes:
+      - ./tickers/nasdaq_screener.csv:/ticker_list
+      - ./docker/raw:/pull_output
+      - ./docker/processed:/process_output
+    restart: unless-stopped
