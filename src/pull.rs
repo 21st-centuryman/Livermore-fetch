@@ -150,12 +150,7 @@ fn build_csv(name: &str, quotes: Vec<Vec<f32>>, path_to: &str) {
                         - df.column("TIMESTAMP")
                             .expect("Can't select TIMESTAMP")
                             .iter()
-                            .position(|x| {
-                                x == old_df
-                                    .tail(Some(1))
-                                    .get(old_df.height() - 1)
-                                    .expect("Can't get last row")[0]
-                            })
+                            .position(|x| x == old_df.tail(Some(1)).get(0).unwrap()[0])
                             .unwrap()
                         - 1,
                 )),
