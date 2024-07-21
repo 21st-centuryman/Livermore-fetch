@@ -48,8 +48,8 @@ UTC: 20:00        24:00         13:30        20:00           24:00           13:
 We basically split the day into midnight and not, so we check the trend and make two values, midnight d1 and midnight fake. then we split if we need
 more days.
 */
-fn add_fake_vals(quotes: Vec<Quote>) -> Vec<Vec<f64>> {
-    let mut new_quotes: Vec<Vec<f64>> = vec![];
+fn add_fake_vals(quotes: Vec<Quote>) -> Vec<Vec<f32>> {
+    let mut new_quotes: Vec<Vec<f32>> = vec![];
     let mut old_q: &Quote = if !quotes.is_empty() {
         &quotes[0]
     } else {
@@ -69,25 +69,25 @@ fn add_fake_vals(quotes: Vec<Quote>) -> Vec<Vec<f64>> {
                 .collect();
             for i in 1..days_since {
                 new_quotes.push(vec![
-                    (i * 86400 + old_q.timestamp.clone() as i32) as f64,
-                    midnights[i as usize - 1] as f64
-                        + 0.0965 * (midnights[i as usize] - midnights[i as usize - 1]) as f64,
-                    midnights[i as usize - 1] as f64
-                        + 0.675 * (midnights[i as usize] - midnights[i as usize - 1]) as f64,
+                    (i * 86400 + old_q.timestamp.clone() as i32) as f32,
+                    midnights[i as usize - 1] as f32
+                        + 0.0965 * (midnights[i as usize] - midnights[i as usize - 1]) as f32,
+                    midnights[i as usize - 1] as f32
+                        + 0.675 * (midnights[i as usize] - midnights[i as usize - 1]) as f32,
                 ]);
             }
         }
         new_quotes.push(vec![
-            quote.timestamp.clone() as f64,
-            quote.open.clone() as f64,
-            quote.close.clone() as f64,
+            quote.timestamp.clone() as f32,
+            quote.open.clone() as f32,
+            quote.close.clone() as f32,
         ]);
         old_q = quote;
     }
     return new_quotes;
 }
 
-fn build_csv(name: &str, quotes: Vec<Vec<f64>>, path_to: &str) {
+fn build_csv(name: &str, quotes: Vec<Vec<f32>>, path_to: &str) {
     let mut df = DataFrame::new(vec![
         Series::new(
             "TIMESTAMP",
@@ -105,26 +105,47 @@ fn build_csv(name: &str, quotes: Vec<Vec<f64>>, path_to: &str) {
             "OPEN",
             quotes
                 .iter()
-                .map(|a| format!("{:.3}", a[1]))
+                .map(|a| format!("{:.3}", a[1]).parse::<f32>().unwrap())
                 .collect::<Vec<_>>(),
         ),
         Series::new(
             "CLOSE",
             quotes
                 .iter()
-                .map(|a| format!("{:.3}", a[2]))
+                .map(|a| format!("{:.3}", a[1]).parse::<f32>().unwrap())
                 .collect::<Vec<_>>(),
         ),
     ])
     .unwrap();
 
     let filepath = format!("{}/{}.csv", path_to, name.replace("/", "|"));
-    //if Path::new(&filepath).exists() {
-    //} else {
+    if Path::new(&filepath).exists() {
+        // We make variable pull_df that pulls a dataframe from the file and unwraps it.
+        // Then it removes the last value as we sometimes can get odd times due to it being taken
+        // the day off.
+        // then we concat the old value with the new
+        let mut test = CsvReadOptions::default()
+            .try_into_reader_with_file_path(Some(Path::new(&filepath).to_path_buf()))
+            .unwrap()
+            .finish()
+            .unwrap();
+        test = test.head(Some(test.clone().height() - 1));
+        df = df.tail(Some(
+            df.height()
+                - df.column("TIMESTAMP")
+                    .expect("")
+                    .iter()
+                    .position(|x| {
+                        x == test.get(test.clone().height() - 1).expect("Something")[0].clone()
+                    })
+                    .unwrap()
+                - 1,
+        ));
+        df = test.vstack(&df).expect("Can't concatenate");
+    }
     CsvWriter::new(File::create(filepath).expect("Can't create file"))
         .include_header(true)
         .with_separator(b',')
         .finish(&mut df)
         .expect("Can't create file");
-    //}
 }
