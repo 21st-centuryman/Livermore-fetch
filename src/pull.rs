@@ -119,29 +119,48 @@ fn build_csv(name: &str, quotes: Vec<Vec<f32>>, path_to: &str) {
     .unwrap();
 
     let filepath = format!("{}/{}.csv", path_to, name.replace("/", "|"));
-    if Path::new(&filepath).exists() {
-        // We make variable pull_df that pulls a dataframe from the file and unwraps it.
-        // Then it removes the last value as we sometimes can get odd times due to it being taken
-        // the day off.
-        // then we concat the old value with the new
-        let mut test = CsvReadOptions::default()
+    if Path::new(&filepath).exists()
+        && CsvReadOptions::default()
             .try_into_reader_with_file_path(Some(Path::new(&filepath).to_path_buf()))
             .unwrap()
             .finish()
-            .unwrap();
-        test = test.head(Some(test.clone().height() - 1));
-        df = df.tail(Some(
-            df.height()
-                - df.column("TIMESTAMP")
-                    .expect("")
-                    .iter()
-                    .position(|x| {
-                        x == test.get(test.clone().height() - 1).expect("Something")[0].clone()
-                    })
-                    .unwrap()
-                - 1,
-        ));
-        df = test.vstack(&df).expect("Can't concatenate");
+            .unwrap()
+            .height()
+            > 1
+    {
+        let old_df = CsvReadOptions::default()
+            .try_into_reader_with_file_path(Some(Path::new(&filepath).to_path_buf()))
+            .unwrap()
+            .finish()
+            .unwrap()
+            .lazy()
+            .select([
+                col("TIMESTAMP").cast(DataType::String),
+                col("OPEN").cast(DataType::Float32),
+                col("CLOSE").cast(DataType::Float32),
+            ])
+            .collect()
+            .expect("Can't cast datepoints");
+
+        df = old_df
+            .head(Some(old_df.height() - 1))
+            .vstack(
+                &df.tail(Some(
+                    df.height()
+                        - df.column("TIMESTAMP")
+                            .expect("Can't select TIMESTAMP")
+                            .iter()
+                            .position(|x| {
+                                x == old_df
+                                    .tail(Some(1))
+                                    .get(old_df.height() - 1)
+                                    .expect("Can't get last row")[0]
+                            })
+                            .unwrap()
+                        - 1,
+                )),
+            )
+            .expect("Can't concatenate");
     }
     CsvWriter::new(File::create(filepath).expect("Can't create file"))
         .include_header(true)
