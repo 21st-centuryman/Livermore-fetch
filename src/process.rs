@@ -11,13 +11,12 @@ pub fn process(path: &str, path_to: &str, pb: Bar) {
         .iter()
         .tqdm_with_bar(pb)
         .for_each(|file: &DirEntry| {
-            if CsvReadOptions::default()
+            if !(CsvReadOptions::default()
                 .try_into_reader_with_file_path(Some(file.path()))
                 .unwrap()
                 .finish()
                 .unwrap()
-                .height()
-                > 0
+                .is_empty())
             {
                 let mut tape = CsvReadOptions::default()
                     .try_into_reader_with_file_path(Some(file.path()))
