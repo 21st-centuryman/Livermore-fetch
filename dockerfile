@@ -1,21 +1,26 @@
-# Use the Alpine Linux base image
-FROM rust:alpine
+FROM rust:alpine as build
+
+WORKDIR /app
 
 RUN apk upgrade
 RUN apk add --no-cache git musl-dev
 
-# Set the working directory to /app
+RUN git clone https://github.com/21st-centuryman/Livermore-fetch.git .
+RUN cargo build --release
+
+FROM alpine:latest
+
 WORKDIR /app
 
-# Copy the Git repository into the container
-RUN git clone https://github.com/21st-centuryman/Livermore-fetch.git .
-# Build the Rust project
-RUN cargo build 
-RUN ls /app
-
-# Define volumes
 VOLUME /ticker_list
 VOLUME /pull_output
 VOLUME /process_output
 
-CMD ["sh", "-c", "cargo run -- -P /ticker_list /pull_output; cargo run -- -p /pull_output /process_output"]
+COPY --from=build /app/target/release/Livermore-fetch /usr/local/bin/
+
+RUN echo '0 14 * * 2 Livermore-fetch -P /ticker_list /pull_output' >> /etc/crontabs/root
+RUN echo "0 15 * * 2 Livermore-fetch -p /pull_output /process_output" > /etc/crontabs/root
+
+RUN chmod +x /etc/crontabs/root
+
+CMD ["crond", "-f", "-d", "8"]
