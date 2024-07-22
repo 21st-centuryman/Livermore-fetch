@@ -1,5 +1,5 @@
 use clap::*;
-use kdam::{term::Colorizer, tqdm, Colour};
+use kdam::{term::Colorizer, tqdm};
 use std::io::IsTerminal;
 
 mod pull;
@@ -20,7 +20,7 @@ fn main() {
             "{remaining}".colorize("blue"),
             "{rate:.1}it/s".colorize("red")
         ),
-        colour = Colour::gradient(&["#5A56E0", "#EE6FF8"])
+        colour = "#fd3173"
     );
 
     // basic app information

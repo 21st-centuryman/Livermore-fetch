@@ -5,8 +5,8 @@ edition = "2021"
 
 [dependencies]
 chrono = "0.4.38"
-clap = { version = "4.5.9", features = ["derive"] }
-kdam = { version = "0.5.2", features = [ "template", "gradient" ] }
+clap =  "4.5.9"
+kdam = { version = "0.5.2", features = [ "template" ] }
 polars = {version = "0.41.3", features = ["lazy"]}
 tokio = {version = "1.38.1", features = ["rt-multi-thread"]}
 yahoo_finance_api = "2.2.0"
