@@ -127,6 +127,7 @@ fn build_csv(name: &str, quotes: Vec<Vec<f32>>, path_to: &str) {
             .unwrap()
             .height()
             > 1
+        && df.height() > 1
     {
         let old_df = CsvReadOptions::default()
             .try_into_reader_with_file_path(Some(Path::new(&filepath).to_path_buf()))
@@ -150,7 +151,15 @@ fn build_csv(name: &str, quotes: Vec<Vec<f32>>, path_to: &str) {
                         - df.column("TIMESTAMP")
                             .expect("Can't select TIMESTAMP")
                             .iter()
-                            .position(|x| x == old_df.tail(Some(1)).get(0).unwrap()[0])
+                            .position(|x| {
+                                &x == &old_df
+                                    .tail(Some(2))
+                                    .column("TIMESTAMP")
+                                    .unwrap()
+                                    .iter()
+                                    .next()
+                                    .unwrap()
+                            })
                             .unwrap()
                         - 1,
                 )),
