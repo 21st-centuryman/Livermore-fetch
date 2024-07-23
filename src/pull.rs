@@ -101,20 +101,8 @@ fn build_csv(name: &str, quotes: Vec<Vec<f32>>, path_to: &str) {
                 })
                 .collect::<Vec<_>>(),
         ),
-        Series::new(
-            "OPEN",
-            quotes
-                .iter()
-                .map(|a| format!("{:.3}", a[1]).parse::<f32>().unwrap())
-                .collect::<Vec<_>>(),
-        ),
-        Series::new(
-            "CLOSE",
-            quotes
-                .iter()
-                .map(|a| format!("{:.3}", a[1]).parse::<f32>().unwrap())
-                .collect::<Vec<_>>(),
-        ),
+        Series::new("OPEN", quotes.iter().map(|a| a[1]).collect::<Vec<_>>()),
+        Series::new("CLOSE", quotes.iter().map(|a| a[2]).collect::<Vec<_>>()),
     ])
     .unwrap();
 
