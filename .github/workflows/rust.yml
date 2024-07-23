@@ -19,16 +19,16 @@ jobs:
     - name: Build
       run: cargo build --verbose
 
-    - name: download nasdaq screener data
-      run: | 
-        curl -s -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true" | jq '.data.rows[] | .symbol' | tr -d '"' > nasdaq.csv
-    
     - name: Run pull
       run: |
+        curl -s -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true" | jq '.data.rows[] | .symbol' | tr -d '"' > nasdaq.csv
         mkdir -p data/raw
         cargo run -- --pull ./nasdaq.csv ./data/raw
 
     - name: Run process
       run: |
+        curl -s -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true" | jq '.data.rows[] | .symbol' | tr -d '"' > nasdaq.csv
+        cargo run -- --pull ./nasdaq.csv ./data/raw
+        mkdir -p data/raw
         mkdir -p data/processed
         cargo run -- --process ./data/raw  ./data/processed
