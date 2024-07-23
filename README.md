@@ -10,7 +10,7 @@
 ## ⇁  Introduction
 Welcome to Livermore fetch. 
 
-The goal of this program is to fetch and process data from the yahoo finance api, then this will be processed using [polars](https://www.pola.rs/) to account for after market trading. I have yet to implement Polars. If I find the time I would love to add this addition.
+The goal of this program is to fetch and process data from the yahoo finance api, then this will be processed using [polars](https://www.pola.rs/) to account for after market trading.
 
 ## ⇁  Run
 Livermore-fetchs can be run in two modes, `pull` and `process`. Below are the output of the help commands:
