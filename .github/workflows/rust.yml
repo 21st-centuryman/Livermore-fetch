@@ -21,17 +21,18 @@ jobs:
 
     - uses: actions/checkout@v4
     - name: download nasdaq screener data
-      run: curl -s -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true" | jq '.data.rows[] | .symbol' | tr -d '"' > nasdaq.csv
+      run: | 
+        curl -s -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36" "https://api.nasdaq.com/api/screener/stocks?tableonly=true&limit=25&offset=0&download=true" | jq '.data.rows[] | .symbol' | tr -d '"' > nasdaq.csv
     
       
     - uses: actions/checkout@v4
     - name: Run pull
       run: |
-      mkdir -p data/raw
-      ./target/releases/Livermore-fetch --pull ./nasdaq.csv ./data/raw
+        mkdir -p data/raw
+        ./target/releases/Livermore-fetch --pull ./nasdaq.csv ./data/raw
 
     - uses: actions/checkout@v4
     - name: Run process
       run: |
-      mkdir -p data/processed
-      ./target/releases/Livermore-fetch --process ./data/raw  ./data/processed
+        mkdir -p data/processed
+        ./target/releases/Livermore-fetch --process ./data/raw  ./data/processed
