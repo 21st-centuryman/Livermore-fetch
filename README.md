@@ -12,16 +12,62 @@ Welcome to Livermore fetch.
 
 The goal of this program is to fetch and process data from the yahoo finance api, then this will be processed using [polars](https://www.pola.rs/) to account for after market trading. I have yet to implement Polars. If I find the time I would love to add this addition.
 
-## ⇁  Structure
-Currently Livermore-fetch is only one main.rs file, this might change in the future as the product grows.
+## ⇁  Run
+Livermore-fetchs can be run in two modes, `pull` and `process`. Below are the output of the help commands:
+```console
+$ Livermore-fetch -h   
+fetching and processing stock data
+
+Usage: Livermore-fetch <COMMAND>
+
+Commands:
+  pull, -P, --pull        Pull data from screener csv
+  process, -p, --process  Process data for Livermore-analyze
+  help                    Print this message or the help of the given subcommand(s)
+
+Options:
+  -h, --help     Print help
+  -V, --version  Print version
+```
+
+Then we also have help commands for the `pull` and `process` commands:
+```console
+$ Livermore-fetch --pull -h
+Pull data from screener csv
+
+Usage: Livermore-fetch {pull|--pull|-P} [path] [path]
+
+Arguments:
+  [path] [path]  /path/to/screener && /path/to/output/
+
+Options:
+  -h, --help  Print help
+```
+Pull will automatically append if the output file exists. It will also add fake data in between days as to mimick forex trading. Afterall this is my project.
+Note that pull needs a csv with the first column having all ticker symbols. 
+```console
+$ Livermore-fetch --process -h
+Process data for Livermore-analyze
+
+Usage: Livermore-fetch {process|--process|-p} [path] [path]
+
+Arguments:
+  [path] [path]  /path/to/data && /path/to/output
+
+Options:
+  -h, --help  Print help
+```
+Process will make everything a single long column called *Tape*. 
+
+We also have a `dockerfile` and a `docker-compose.yml` example. If you want to edit stuff like how often it is run you edit the `dockerfile`.
 
 ## ⇁  Contribute
 If you have any contribution feel free to add them I am more than inclined to make this work.
 
 ## ⇁  Current status
-This is still a major work in progress, please see below for the 4 stages to this:
+More or less done, could be buggy idk haven't tested it enough.
 
 - [X] Fetch all symbols used in the yahoo api.
 - [X] Fetch all the daily stock information for the last 10 years.
-- [] Integrate this with [polars](https://www.pola.rs/) to account for after market trades.
-- [] Add a dockerfile to make this able to be executed monthly on servers headlessly.
+- [x] Integrate this with [polars](https://www.pola.rs/) to account for after market trades.
+- [x] Add a dockerfile to make this able to be executed monthly on servers headlessly.
