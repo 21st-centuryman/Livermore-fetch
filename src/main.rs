@@ -49,7 +49,7 @@ fn main() {
                 .about("Process data for Livermore-analyze")
                 .arg(
                     Arg::new("path")
-                        .help("/path/to/data && /path/to/output && size of columns")
+                        .help("/path/to/data && /path/to/output")
                         .action(ArgAction::Set)
                         .num_args(2),
                 ),
