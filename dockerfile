@@ -3,9 +3,8 @@ FROM rust:alpine as build
 WORKDIR /app
 
 RUN apk upgrade
-RUN apk add --no-cache git musl-dev
-
-RUN git clone https://github.com/21st-centuryman/Livermore-fetch.git .
+RUN apk add --no-cache musl-dev
+COPY . .
 RUN cargo build --release
 
 FROM alpine:latest

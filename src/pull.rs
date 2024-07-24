@@ -84,6 +84,7 @@ fn add_fake_vals(quotes: Vec<Quote>) -> Vec<Vec<f32>> {
         ]);
         old_q = quote;
     }
+    new_quotes.pop().unwrap();
     return new_quotes;
 }
 
@@ -132,7 +133,6 @@ fn build_csv(name: &str, quotes: Vec<Vec<f32>>, path_to: &str) {
             .expect("Can't cast datepoints");
 
         df = old_df
-            .head(Some(old_df.height() - 1))
             .vstack(
                 &df.tail(Some(
                     df.height()
@@ -141,7 +141,7 @@ fn build_csv(name: &str, quotes: Vec<Vec<f32>>, path_to: &str) {
                             .iter()
                             .position(|x| {
                                 &x == &old_df
-                                    .tail(Some(2))
+                                    .tail(Some(1))
                                     .column("TIMESTAMP")
                                     .unwrap()
                                     .iter()
