@@ -23,8 +23,6 @@ fn main() {
         colour = "#fd3173"
     );
 
-    // basic app information
-    // Parse the command line arguments using the generated Args struct
     let matches = Command::new("livermore")
         .about("fetching and processing stock data")
         .version("0.1.0")
