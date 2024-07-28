@@ -17,12 +17,10 @@ pub fn pull(csv_file: &str, path_to: &str, pb: Bar) {
 }
 
 fn get_quote_range(quote: &str) -> Vec<Quote> {
-    match Runtime::new().unwrap().block_on(async {
-        yahoo::YahooConnector::new()
-            .unwrap()
-            .get_quote_range(quote, "1d", "10y")
-            .await
-    }) {
+    match Runtime::new()
+        .unwrap()
+        .block_on(async { yahoo::YahooConnector::new().unwrap().get_quote_range(quote, "1d", "10y").await })
+    {
         Ok(quotes) => quotes.quotes().unwrap_or_default(),
         Err(_) => Vec::new(),
     }
@@ -31,55 +29,13 @@ fn get_quote_range(quote: &str) -> Vec<Quote> {
 fn build_csv(name: &str, q: Vec<Quote>, path_to: &str) {
     if !q.is_empty() {
         let mut df = DataFrame::new(vec![
-            Series::new(
-                "TIMESTAMP",
-                q.iter()
-                    .take(q.len() - 1)
-                    .map(|a| a.timestamp)
-                    .collect::<Vec<_>>(),
-            ),
-            Series::new(
-                "OPEN",
-                q.iter()
-                    .take(q.len() - 1)
-                    .map(|a| a.open)
-                    .collect::<Vec<_>>(),
-            ),
-            Series::new(
-                "HIGH",
-                q.iter()
-                    .take(q.len() - 1)
-                    .map(|a| a.high)
-                    .collect::<Vec<_>>(),
-            ),
-            Series::new(
-                "LOW",
-                q.iter()
-                    .take(q.len() - 1)
-                    .map(|a| a.low)
-                    .collect::<Vec<_>>(),
-            ),
-            Series::new(
-                "VOLUME",
-                q.iter()
-                    .take(q.len() - 1)
-                    .map(|a| a.volume)
-                    .collect::<Vec<_>>(),
-            ),
-            Series::new(
-                "CLOSE",
-                q.iter()
-                    .take(q.len() - 1)
-                    .map(|a| a.close)
-                    .collect::<Vec<_>>(),
-            ),
-            Series::new(
-                "ADJCLOSE",
-                q.iter()
-                    .take(q.len() - 1)
-                    .map(|a| a.adjclose)
-                    .collect::<Vec<_>>(),
-            ),
+            Series::new("TIMESTAMP", q.iter().take(q.len() - 1).map(|a| a.timestamp).collect::<Vec<_>>()),
+            Series::new("OPEN", q.iter().take(q.len() - 1).map(|a| a.open).collect::<Vec<_>>()),
+            Series::new("HIGH", q.iter().take(q.len() - 1).map(|a| a.high).collect::<Vec<_>>()),
+            Series::new("LOW", q.iter().take(q.len() - 1).map(|a| a.low).collect::<Vec<_>>()),
+            Series::new("VOLUME", q.iter().take(q.len() - 1).map(|a| a.volume).collect::<Vec<_>>()),
+            Series::new("CLOSE", q.iter().take(q.len() - 1).map(|a| a.close).collect::<Vec<_>>()),
+            Series::new("ADJCLOSE", q.iter().take(q.len() - 1).map(|a| a.adjclose).collect::<Vec<_>>()),
         ])
         .unwrap();
 
