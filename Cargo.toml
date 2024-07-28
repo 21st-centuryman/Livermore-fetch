@@ -7,6 +7,6 @@ edition = "2021"
 chrono = "0.4.38"
 clap =  "4.5.9"
 kdam = { version = "0.5.2", features = [ "template" ] }
-polars = {version = "0.41.3", features = ["lazy"]}
+polars = {version = "0.41.3", features = ["lazy", "dtype-struct"]}
 tokio = {version = "1.38.1", features = ["rt-multi-thread"]}
 yahoo_finance_api = "2.2.0"
