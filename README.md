@@ -60,6 +60,3 @@ Options:
 Process will make everything a single long column called *Tape*. 
 
 We also have a `dockerfile` and a `docker-compose.yml` example. If you want to edit stuff like how often it is run you edit the `dockerfile`.
-
-## ⇁  Contribute
-If you have any contribution feel free to add them I am more than inclined to make this work.
