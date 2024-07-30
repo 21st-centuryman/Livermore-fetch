@@ -63,11 +63,3 @@ We also have a `dockerfile` and a `docker-compose.yml` example. If you want to e
 
 ## ⇁  Contribute
 If you have any contribution feel free to add them I am more than inclined to make this work.
-
-## ⇁  Current status
-More or less done, could be buggy idk haven't tested it enough.
-
-- [X] Fetch all symbols used in the yahoo api.
-- [X] Fetch all the daily stock information for the last 10 years.
-- [x] Integrate this with [polars](https://www.pola.rs/) to account for after market trades.
-- [x] Add a dockerfile to make this able to be executed monthly on servers headlessly.
