@@ -43,7 +43,7 @@ Arguments:
 Options:
   -h, --help  Print help
 ```
-Pull will automatically append if the output file exists. It will also add fake data in between days as to mimick forex trading. Afterall this is my project.
+Pull will automatically append if the output file exists. 
 Note that pull needs a csv with the first column having all ticker symbols. 
 ```console
 $ Livermore-fetch --process -h
@@ -57,6 +57,6 @@ Arguments:
 Options:
   -h, --help  Print help
 ```
-Process will make everything a single long column called *Tape*. 
+Process will make everything a single long column called *Tape*. It will also add fake data in between days as to mimick forex trading. Afterall this is my project.
 
 We also have a `dockerfile` and a `docker-compose.yml` example. If you want to edit stuff like how often it is run you edit the `dockerfile`.
