@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-chrono = "0.4.38"
 clap =  "4.5.9"
 kdam = { version = "0.5.2", features = [ "template" ] }
 polars = {version = "0.41.3", features = ["lazy", "dtype-struct"]}
