@@ -1,0 +1,13 @@
+debug/
+target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+.DS_Store
+tickers/
+docker/
+.github/
+.git
+.gitignore
+README.md
+rustfmt.toml
